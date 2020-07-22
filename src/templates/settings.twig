@@ -1,0 +1,35 @@
+{% import "_includes/forms" as forms %}
+{% set errorSummary = settings.getErrorSummary(false) %}
+
+<h1>Disclaimer</h1>
+<p>
+    This plugin is provided to you by <a href="https://cstudios.sk">Cstudios s.r.o.</a>
+    Please use it at your own risk.
+</p>
+<p>
+    We recommend using the soft-switch on this page to enable or disable the page caching,
+    because we will provide an api override in the future that will be able to
+    turn that setting on and off remotely.
+</p>
+
+<hr>
+{{ forms.lightswitchField({
+    first: true,
+    label: "Enabled",
+    instructions: 'This switch enabled | disables the plugins overall caching functionality.'|t('turbo','enabledIstruction'),
+    name: 'enabled',
+    on: settings.enabled,
+}) }}
+
+{{ forms.textField({
+    label: "Duration in Minutes",
+    instructions: 'The cache duration defined in minutes.'|t('turbo','durationInMinutesIstruction'),
+    name: 'durationInMinutes',
+    value: settings.durationInMinutes,
+    errors: settings.getErrors('durationInMinutes')
+}) }}
+
+<p>
+    <a href="{{ craft.app.urlManager.createUrl('/turbo/settings/increase-cache-version') }}" class="btn submit">Empty Cache</a>
+</p>
+
