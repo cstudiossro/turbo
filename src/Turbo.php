@@ -101,6 +101,7 @@ class Turbo extends Plugin
                             $cacheVersion,
                             Craft::$app->request->fullPath,
                             Craft::$app->request->get(),
+                            Craft::$app->language,
                         ],
                     ]);
                 }
