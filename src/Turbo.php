@@ -102,6 +102,7 @@ class Turbo extends Plugin
                             Craft::$app->request->fullPath,
                             Craft::$app->request->get(),
                             Craft::$app->language,
+                            Craft::$app->user->isGuest,
                         ],
                     ]);
                 }
