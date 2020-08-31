@@ -10,18 +10,12 @@
 
 namespace cstudios\turbo;
 
-
 use Craft;
 use craft\base\Plugin;
 use craft\events\RegisterUrlRulesEvent;
-use craft\helpers\App;
-use craft\services\Plugins;
-use craft\events\PluginEvent;
-
 use craft\web\Application;
 use craft\web\UrlManager;
-use craft\web\View;
-use cstudios\turbo\controllers\SettingsController;
+use cstudios\turbo\behaviors\CommerceCompatibilityBehavior;
 use cstudios\turbo\models\Settings;
 use yii\base\Event;
 
@@ -32,20 +26,33 @@ use yii\base\Event;
  * @package   Turbo
  * @since     1.0.0
  *
+ *
+ * @property-read null|bool|Settings $settings
  */
 class Turbo extends Plugin
 {
+
+    // Events
+    // =========================================================================
+
+    const EVENT_COMPATIBILITY_CHECK = 'compatibilityCheck';
+
+    // Public Properties
+    // =========================================================================
 
     /**
      * @var Turbo
      */
     public static $plugin;
 
-    // Public Properties
-    // =========================================================================
-
+    /**
+     * @var string
+     */
     public $id = 'turbo';
 
+    /**
+     * @var string
+     */
     public $handle = 'turbo';
 
     /**
@@ -63,12 +70,31 @@ class Turbo extends Plugin
      */
     public $hasCpSection = false;
 
+    /**
+     * This will turn true whenever there is a compatibility issue
+     * @var bool
+     */
+    public $attachingIsUnsafe = false;
+
+    /**
+     * @var string[]
+     */
     public $controllerMap = [
         'settings' => 'cstudios\turbo\controllers\SettingsController'
     ];
 
     // Public Methods
     // =========================================================================
+
+    /**
+     * @inheritDoc
+     */
+    public function behaviors()
+    {
+        return [
+            'commerceCompatibilityBehavior' => CommerceCompatibilityBehavior::class,
+        ];
+    }
 
     /**
      * @inheritdoc
@@ -87,16 +113,18 @@ class Turbo extends Plugin
         Event::on(
             Application::class,
             Application::EVENT_BEFORE_ACTION,
-            function ($event){
+            function ($event) {
 
                 $enabled = $this->getSettings()->enabled;
                 $cacheVersion = $this->getSettings()->cacheVersion;
                 $durationInMinutes = $this->getSettings()->durationInMinutes;
 
-                if ($enabled && !Craft::$app->request->isCpRequest){
-                    Craft::$app->controller->attachBehavior('turbo',[
+                $this->trigger(self::EVENT_COMPATIBILITY_CHECK);
+
+                if ($enabled && !$this->attachingIsUnsafe && !Craft::$app->request->isCpRequest) {
+                    Craft::$app->controller->attachBehavior('turbo', [
                         'class' => 'yii\filters\PageCache',
-                        'duration' => $durationInMinutes*60,
+                        'duration' => $durationInMinutes * 60,
                         'variations' => [
                             $cacheVersion,
                             Craft::$app->request->fullPath,
@@ -107,14 +135,13 @@ class Turbo extends Plugin
                     ]);
                 }
 
-
             }
         );
 
         Event::on(
             UrlManager::class,
             UrlManager::EVENT_REGISTER_CP_URL_RULES,
-            function (RegisterUrlRulesEvent $event){
+            function (RegisterUrlRulesEvent $event) {
                 $event->rules['turbo/<controller>/<action>'] = 'turbo/<controller>/<action>';
             }
         );
@@ -144,7 +171,7 @@ class Turbo extends Plugin
 
     protected function settingsHtml()
     {
-        return \Craft::$app->getView()->renderTemplate('turbo/settings', [
+        return Craft::$app->getView()->renderTemplate('turbo/settings', [
             'settings' => $this->getSettings()
         ]);
     }
