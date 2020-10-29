@@ -16,6 +16,23 @@ This plugin requires Craft CMS 3.0.0-beta.23 or later.
 composer require cstudios/turbo
 ```
 
+## Note:
+
+If you have some dynamic contents on your site, you wan't to be excluded from page caching
+then you can use the following code:
+
+```twig
+{{ craft.app.view.renderDynamic('return Craft::$app->view->renderString("
+    {{ csrfInput }}
+");') | raw }}
+```
+
+To make it easier for you, we've already implemented csrfInput into this plugin,
+so you just have to use:
+```twig
+{{ craft.turbo.csrfInput() | raw }}
+```
+
 Brought to you by [Gergely Horvath](https://github.com/hunwalk)
 <br>
 Supported by ❤️ [Cstudios s.r.o.](https://cstudios.sk)
