@@ -14,9 +14,11 @@ use Craft;
 use craft\base\Plugin;
 use craft\events\RegisterUrlRulesEvent;
 use craft\web\Application;
+use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
 use cstudios\turbo\behaviors\CommerceCompatibilityBehavior;
 use cstudios\turbo\models\Settings;
+use cstudios\turbo\services\TurboService;
 use yii\base\Event;
 
 /**
@@ -109,6 +111,14 @@ class Turbo extends Plugin
         } else {
             $this->controllerNamespace = 'cstudios\\turbo\\controllers';
         }
+
+        Event::on(CraftVariable::class, CraftVariable::EVENT_INIT, function(Event $e) {
+            /** @var CraftVariable $variable */
+            $variable = $e->sender;
+
+            // Attach a service:
+            $variable->set('turbo', Craft::createObject(['class' => '\cstudios\turbo\services\TurboService', 'plugin' => $this]));
+        });
 
         Event::on(
             Application::class,
