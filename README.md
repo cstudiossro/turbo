@@ -16,6 +16,16 @@ This plugin requires Craft CMS 3.0.0-beta.23 or later.
 composer require cstudios/turbo
 ```
 
+And add the following lines to your `app.php` or `app.web.php` config file
+```php
+'components' => [
+    'view' => [
+        'class' => 'craft\web\View',
+        'allowEval' => true
+    ]
+]
+```
+
 ## Note:
 
 If you have some dynamic contents on your site, you wan't to be excluded from page caching
