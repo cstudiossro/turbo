@@ -133,7 +133,7 @@ class Turbo extends Plugin
                 $this->trigger(self::EVENT_COMPATIBILITY_CHECK);
 
                 if ($enabled && !$this->attachingIsUnsafe && !Craft::$app->request->isCpRequest) {
-                    if ($this->isUrlExcluded()){
+                    if (!$this->isUrlExcluded()){
                         Craft::$app->controller->attachBehavior('turbo', [
                             'class' => 'yii\filters\PageCache',
                             'duration' => $durationInMinutes * 60,
