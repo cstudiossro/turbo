@@ -20,6 +20,7 @@ use cstudios\turbo\behaviors\CommerceCompatibilityBehavior;
 use cstudios\turbo\models\Settings;
 use cstudios\turbo\services\TurboService;
 use yii\base\Event;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class Turbo
@@ -132,17 +133,19 @@ class Turbo extends Plugin
                 $this->trigger(self::EVENT_COMPATIBILITY_CHECK);
 
                 if ($enabled && !$this->attachingIsUnsafe && !Craft::$app->request->isCpRequest) {
-                    Craft::$app->controller->attachBehavior('turbo', [
-                        'class' => 'yii\filters\PageCache',
-                        'duration' => $durationInMinutes * 60,
-                        'variations' => [
-                            $cacheVersion,
-                            Craft::$app->request->fullPath,
-                            Craft::$app->request->get(),
-                            Craft::$app->language,
-                            Craft::$app->user->isGuest,
-                        ],
-                    ]);
+                    if ($this->isUrlExcluded()){
+                        Craft::$app->controller->attachBehavior('turbo', [
+                            'class' => 'yii\filters\PageCache',
+                            'duration' => $durationInMinutes * 60,
+                            'variations' => [
+                                $cacheVersion,
+                                Craft::$app->request->fullPath,
+                                Craft::$app->request->get(),
+                                Craft::$app->language,
+                                Craft::$app->user->isGuest,
+                            ],
+                        ]);
+                    }
                 }
 
             }
@@ -164,6 +167,30 @@ class Turbo extends Plugin
             ),
             __METHOD__
         );
+    }
+
+    public function isUrlExcluded()
+    {
+        $currentUrl = Craft::$app->request->url;
+        $excludedUrls = $this->getExcludedUrls();
+
+        foreach ($excludedUrls as $excludedUrl){
+            if (fnmatch($excludedUrl, $currentUrl))
+                return true;
+        }
+
+        return false;
+    }
+
+    public function getExcludedUrls()
+    {
+        return $this->getParam('turbo.excludedUrls');
+    }
+
+    public function getParam($name)
+    {
+        $params = Craft::$app->params;
+        return ArrayHelper::getValue($params,$name,[]);
     }
 
     /**
