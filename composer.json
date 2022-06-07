@@ -2,7 +2,7 @@
     "name": "cstudios/turbo",
     "description": "This plugin utilizes the PageCache filter from yii2 into your craft 3 instance",
     "type": "craft-plugin",
-    "version": "1.4.1",
+    "version": "1.4.2",
     "keywords": [
         "craft",
         "cms",
@@ -23,7 +23,8 @@
         }
     ],
     "require": {
-        "craftcms/cms": "^3.0.0"
+        "php": "^7.0|^8.0",
+        "craftcms/cms": "^3.0.0|^4.0"
     },
     "autoload": {
         "psr-4": {

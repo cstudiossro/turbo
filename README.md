@@ -9,6 +9,7 @@ This plugin utilizes the PageCache filter from yii2 into your craft 3 instance
 ## Requirements
 
 This plugin requires Craft CMS 3.0.0-beta.23 or later.
+This plugins also supports Craft 4.
 
 ## Installation
 
