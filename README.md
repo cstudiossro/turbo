@@ -44,13 +44,11 @@ You can use wildcarded urls as well with the asterisk (*) character
 
 ## Note:
 
-If you have some dynamic contents on your site, you wan't to be excluded from page caching then you can use the
+If you have some dynamic contents on your site, you want to be excluded from page caching then you can use the
 following code:
 
 ```twig
-{{ craft.app.view.renderDynamic('return Craft::$app->view->renderString("
-    {{ csrfInput }}
-");') | raw }}
+{{ craft.turbo.renderDynamic('csrfInput()') | raw }}
 ```
 
 To make it easier for you, we've already implemented csrfInput into this plugin, so you just have to use:
