@@ -25,6 +25,10 @@ class TurboService extends Component
         parent::init();
     }
 
+    public function renderDynamic($twigString){
+        return Craft::$app->view->renderDynamic("return Craft::\$app->view->renderString('{{ ".$twigString." }}');");
+    }
+
     public function csrfInput()
     {
         return Craft::$app->view->renderDynamic("return Craft::\$app->view->renderString('{{ csrfInput() }}');");
